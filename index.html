@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Alexander Mercer — Private Banking</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #0b0f1a;
+    --navy2:   #111827;
+    --navy3:   #1a2236;
+    --gold:    #c9a96e;
+    --gold2:   #e8d5b0;
+    --gold3:   #8a6a38;
+    --cream:   #f5f0e8;
+    --muted:   #8a95a8;
+    --white:   #ffffff;
+    --serif:   'Cormorant Garamond', Georgia, serif;
+    --sans:    'Outfit', sans-serif;
+    --ease:    cubic-bezier(.22,.68,0,1.2);
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--cream);
+    font-family: var(--sans);
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    pointer-events: none;
+  }
+  .cursor-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold);
+    position: absolute; transform: translate(-50%,-50%);
+    transition: transform .1s;
+  }
+  .cursor-ring {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid rgba(201,169,110,.4);
+    position: absolute; transform: translate(-50%,-50%);
+    transition: transform .18s var(--ease), width .25s, height .25s, border-color .25s;
+  }
+  body:has(a:hover) .cursor-ring,
+  body:has(button:hover) .cursor-ring {
+    width: 54px; height: 54px;
+    border-color: rgba(201,169,110,.8);
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 60px;
+    transition: background .4s, padding .4s, backdrop-filter .4s;
+  }
+  nav.scrolled {
+    background: rgba(11,15,26,.88);
+    backdrop-filter: blur(18px);
+    padding: 18px 60px;
+    border-bottom: 1px solid rgba(201,169,110,.12);
+  }
+  .nav-logo {
+    font-family: var(--serif); font-size: 1.15rem; letter-spacing: .08em;
+    color: var(--gold); text-decoration: none; font-weight: 400;
+  }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: .78rem;
+    letter-spacing: .16em; text-transform: uppercase; font-weight: 500;
+    transition: color .3s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; right: 100%;
+    height: 1px; background: var(--gold); transition: right .35s var(--ease);
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-links a:hover::after { right: 0; }
+  .nav-cta {
+    border: 1px solid rgba(201,169,110,.5); color: var(--gold);
+    padding: 10px 26px; font-size: .75rem; letter-spacing: .18em;
+    text-transform: uppercase; text-decoration: none; font-weight: 500;
+    transition: background .3s, color .3s;
+  }
+  .nav-cta:hover { background: var(--gold); color: var(--navy); }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh; display: flex; align-items: center;
+    position: relative; overflow: hidden;
+    padding: 0 60px;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 50%, rgba(201,169,110,.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 80% at 20% 80%, rgba(26,34,54,.9) 0%, transparent 70%);
+  }
+  .hero-grid-lines {
+    position: absolute; inset: 0; opacity: .04;
+    background-image:
+      linear-gradient(rgba(201,169,110,1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,169,110,1) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+  .hero-number {
+    position: absolute; right: 60px; top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-family: var(--serif); font-size: 11rem; font-weight: 300;
+    color: rgba(201,169,110,.06); letter-spacing: -.02em;
+    pointer-events: none; user-select: none;
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 700px; }
+  .hero-eyebrow {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 32px; opacity: 0; animation: fadeUp .8s .2s forwards;
+  }
+  .hero-eyebrow-line { width: 40px; height: 1px; background: var(--gold); }
+  .hero-eyebrow span {
+    font-size: .72rem; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--gold); font-weight: 500;
+  }
+  .hero-name {
+    font-family: var(--serif); font-size: clamp(3.2rem, 6vw, 5.8rem);
+    font-weight: 300; line-height: 1.02; letter-spacing: -.01em;
+    color: var(--white); margin-bottom: 20px;
+    opacity: 0; animation: fadeUp .9s .35s forwards;
+  }
+  .hero-name em { color: var(--gold); font-style: italic; }
+  .hero-tagline {
+    font-family: var(--serif); font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-weight: 300; color: var(--muted); font-style: italic;
+    margin-bottom: 40px; line-height: 1.6;
+    opacity: 0; animation: fadeUp .9s .5s forwards;
+  }
+  .hero-desc {
+    font-size: .92rem; line-height: 1.9; color: rgba(245,240,232,.6);
+    max-width: 520px; margin-bottom: 52px;
+    opacity: 0; animation: fadeUp .9s .65s forwards;
+  }
+  .hero-actions {
+    display: flex; gap: 20px; align-items: center;
+    opacity: 0; animation: fadeUp .9s .8s forwards;
+  }
+  .btn-primary {
+    background: var(--gold); color: var(--navy);
+    padding: 16px 40px; text-decoration: none; font-size: .78rem;
+    letter-spacing: .18em; text-transform: uppercase; font-weight: 600;
+    transition: background .3s, transform .3s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); }
+  .btn-ghost {
+    color: var(--cream); text-decoration: none; font-size: .78rem;
+    letter-spacing: .18em; text-transform: uppercase; font-weight: 500;
+    border-bottom: 1px solid rgba(245,240,232,.3);
+    padding-bottom: 2px; transition: color .3s, border-color .3s;
+  }
+  .btn-ghost:hover { color: var(--gold); border-color: var(--gold); }
+  .hero-stats {
+    position: absolute; bottom: 60px; right: 60px;
+    display: flex; gap: 50px; z-index: 2;
+    opacity: 0; animation: fadeUp .9s 1s forwards;
+  }
+  .hero-stat-num {
+    font-family: var(--serif); font-size: 2.6rem; font-weight: 300;
+    color: var(--gold); line-height: 1;
+    display: block; margin-bottom: 6px;
+  }
+  .hero-stat-label {
+    font-size: .68rem; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .scroll-indicator {
+    position: absolute; bottom: 60px; left: 60px; z-index: 2;
+    display: flex; align-items: center; gap: 14px;
+    opacity: 0; animation: fadeUp .9s 1.1s forwards;
+  }
+  .scroll-line {
+    width: 1px; height: 60px; background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  .scroll-text {
+    writing-mode: vertical-lr; font-size: .68rem;
+    letter-spacing: .22em; text-transform: uppercase; color: var(--muted);
+  }
+
+  /* ─── SECTION SHARED ─── */
+  section { padding: 120px 60px; }
+  .section-label {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+  }
+  .section-label-line { width: 30px; height: 1px; background: var(--gold); }
+  .section-label span {
+    font-size: .68rem; letter-spacing: .24em; text-transform: uppercase;
+    color: var(--gold); font-weight: 500;
+  }
+  .section-title {
+    font-family: var(--serif); font-size: clamp(2.2rem, 4vw, 3.6rem);
+    font-weight: 300; line-height: 1.1; color: var(--white); margin-bottom: 20px;
+  }
+  .section-title em { color: var(--gold); font-style: italic; }
+
+  /* ─── ABOUT ─── */
+  #about { background: var(--navy2); }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+    align-items: center; margin-top: 70px;
+  }
+  .about-image-wrap {
+    position: relative;
+  }
+  .about-photo-frame {
+    position: relative; width: 100%; padding-top: 120%;
+    overflow: hidden;
+  }
+  .about-photo {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(135deg, #1a2236 0%, #0f1522 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .about-photo-initials {
+    font-family: var(--serif); font-size: 8rem; font-weight: 300;
+    color: rgba(201,169,110,.18); letter-spacing: -.03em;
+  }
+  .about-photo-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(11,15,26,.6) 0%, transparent 60%);
+  }
+  .about-accent-box {
+    position: absolute; bottom: -20px; right: -20px;
+    width: 120px; height: 120px;
+    border: 1px solid rgba(201,169,110,.3);
+    z-index: -1;
+  }
+  .about-accent-box2 {
+    position: absolute; top: -16px; left: -16px;
+    width: 60px; height: 60px;
+    background: var(--gold3); opacity: .25;
+  }
+  .about-text p {
+    font-size: .95rem; line-height: 2; color: rgba(245,240,232,.65);
+    margin-bottom: 24px;
+  }
+  .about-text p:first-child { color: rgba(245,240,232,.85); font-size: 1.05rem; }
+  .about-credentials {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-top: 36px;
+  }
+  .credential-tag {
+    border: 1px solid rgba(201,169,110,.25);
+    padding: 8px 18px; font-size: .72rem;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--gold);
+  }
+
+  /* ─── EXPERTISE ─── */
+  #expertise { background: var(--navy); }
+  .expertise-header { display: flex; justify-content: space-between; align-items: flex-end; }
+  .expertise-intro {
+    font-size: .92rem; line-height: 1.9; color: rgba(245,240,232,.55);
+    max-width: 380px; padding-bottom: 10px;
+  }
+  .expertise-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    margin-top: 60px;
+  }
+  .expertise-card {
+    background: var(--navy2); padding: 48px 40px;
+    position: relative; overflow: hidden;
+    transition: transform .4s var(--ease);
+  }
+  .expertise-card::before {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 100%;
+    height: 2px; background: var(--gold);
+    transition: right .45s var(--ease);
+  }
+  .expertise-card:hover { transform: translateY(-6px); }
+  .expertise-card:hover::before { right: 0; }
+  .card-number {
+    font-family: var(--serif); font-size: 3.5rem; font-weight: 300;
+    color: rgba(201,169,110,.12); line-height: 1;
+    margin-bottom: 24px; display: block;
+    transition: color .3s;
+  }
+  .expertise-card:hover .card-number { color: rgba(201,169,110,.22); }
+  .card-icon {
+    width: 44px; height: 44px; margin-bottom: 20px;
+    color: var(--gold); opacity: .8;
+  }
+  .card-title {
+    font-family: var(--serif); font-size: 1.4rem; font-weight: 400;
+    color: var(--white); margin-bottom: 14px; line-height: 1.3;
+  }
+  .card-desc {
+    font-size: .86rem; line-height: 1.85; color: var(--muted);
+  }
+
+  /* ─── TRACK RECORD ─── */
+  #results {
+    background: var(--navy3);
+    position: relative; overflow: hidden;
+  }
+  .results-bg-text {
+    position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
+    font-family: var(--serif); font-size: 18rem; font-weight: 300;
+    color: rgba(201,169,110,.03); pointer-events: none;
+    white-space: nowrap;
+  }
+  .results-grid {
+    display: grid; grid-template-columns: 1fr 1.4fr; gap: 80px;
+    align-items: center; margin-top: 70px;
+  }
+  .metrics-stack { display: flex; flex-direction: column; gap: 0; }
+  .metric-row {
+    display: flex; align-items: center; gap: 24px;
+    padding: 28px 0; border-bottom: 1px solid rgba(201,169,110,.1);
+    position: relative;
+  }
+  .metric-row:first-child { border-top: 1px solid rgba(201,169,110,.1); }
+  .metric-value {
+    font-family: var(--serif); font-size: 2.8rem; font-weight: 300;
+    color: var(--gold); min-width: 130px; line-height: 1;
+  }
+  .metric-info {}
+  .metric-label {
+    font-size: .9rem; color: var(--white); font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .metric-sub {
+    font-size: .78rem; color: var(--muted);
+  }
+  .results-text .section-title { margin-bottom: 30px; }
+  .results-text p {
+    font-size: .92rem; line-height: 2; color: rgba(245,240,232,.6);
+    margin-bottom: 20px;
+  }
+  .results-quote {
+    border-left: 2px solid var(--gold);
+    padding: 20px 28px; margin-top: 40px;
+    background: rgba(201,169,110,.04);
+  }
+  .results-quote p {
+    font-family: var(--serif); font-size: 1.1rem; font-style: italic;
+    color: var(--cream); margin: 0; line-height: 1.7;
+  }
+  .results-quote cite {
+    display: block; margin-top: 12px;
+    font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--gold); font-style: normal;
+  }
+
+  /* ─── TESTIMONIALS ─── */
+  #testimonials { background: var(--navy2); }
+  .testimonials-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px; margin-top: 60px;
+  }
+  .testimonial-card {
+    background: var(--navy3); padding: 44px 36px;
+    position: relative;
+  }
+  .testimonial-card::before {
+    content: '\201C';
+    font-family: var(--serif); font-size: 6rem; line-height: .8;
+    color: var(--gold); opacity: .18;
+    position: absolute; top: 24px; left: 28px;
+    pointer-events: none;
+  }
+  .testimonial-text {
+    font-family: var(--serif); font-size: 1rem; font-style: italic;
+    line-height: 1.8; color: rgba(245,240,232,.8);
+    margin-bottom: 32px; position: relative; z-index: 1;
+  }
+  .testimonial-author { display: flex; align-items: center; gap: 14px; }
+  .author-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold3), var(--navy3));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-size: 1rem; color: var(--gold);
+    flex-shrink: 0;
+  }
+  .author-name { font-size: .85rem; color: var(--white); font-weight: 500; }
+  .author-title { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+  .stars { color: var(--gold); font-size: .75rem; letter-spacing: 2px; margin-bottom: 6px; }
+
+  /* ─── CONTACT ─── */
+  #contact { background: var(--navy); }
+  .contact-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+    margin-top: 70px; align-items: start;
+  }
+  .contact-info p {
+    font-size: .92rem; line-height: 2; color: rgba(245,240,232,.6);
+    margin-bottom: 40px;
+  }
+  .contact-items { display: flex; flex-direction: column; gap: 20px; }
+  .contact-item { display: flex; gap: 20px; align-items: flex-start; }
+  .contact-item-icon {
+    width: 44px; height: 44px; border: 1px solid rgba(201,169,110,.25);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: var(--gold); font-size: .9rem;
+  }
+  .contact-item-label {
+    font-size: .68rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 4px;
+  }
+  .contact-item-value { font-size: .9rem; color: var(--cream); }
+  .contact-form { display: flex; flex-direction: column; gap: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-label {
+    font-size: .68rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .form-input, .form-select, .form-textarea {
+    background: var(--navy2); border: 1px solid rgba(201,169,110,.18);
+    color: var(--cream); padding: 14px 18px; font-family: var(--sans);
+    font-size: .88rem; font-weight: 300; outline: none;
+    transition: border-color .3s; resize: none;
+    appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: rgba(201,169,110,.55);
+  }
+  .form-input::placeholder, .form-textarea::placeholder { color: rgba(138,149,168,.4); }
+  .form-select option { background: var(--navy2); }
+  .form-textarea { min-height: 130px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .submit-btn {
+    background: transparent; border: 1px solid var(--gold); color: var(--gold);
+    padding: 16px 40px; font-family: var(--sans); font-size: .78rem;
+    letter-spacing: .18em; text-transform: uppercase; font-weight: 600;
+    cursor: none; transition: background .3s, color .3s; margin-top: 8px;
+    align-self: flex-start;
+  }
+  .submit-btn:hover { background: var(--gold); color: var(--navy); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--navy2); border-top: 1px solid rgba(201,169,110,.1);
+    padding: 40px 60px; display: flex; justify-content: space-between;
+    align-items: center;
+  }
+  .footer-logo {
+    font-family: var(--serif); font-size: 1rem; color: var(--gold);
+    letter-spacing: .06em;
+  }
+  .footer-copy { font-size: .72rem; color: var(--muted); letter-spacing: .1em; }
+  .footer-social { display: flex; gap: 20px; }
+  .social-link {
+    width: 36px; height: 36px; border: 1px solid rgba(201,169,110,.2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); text-decoration: none; font-size: .75rem;
+    transition: border-color .3s, color .3s;
+  }
+  .social-link:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ─── DIVIDER ─── */
+  .gold-divider {
+    display: flex; align-items: center; gap: 20px; margin: 50px 0;
+  }
+  .gold-divider-line { flex: 1; height: 1px; background: rgba(201,169,110,.15); }
+  .gold-divider-diamond {
+    width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg);
+    opacity: .5;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: .4; transform: scaleY(1); }
+    50%       { opacity: 1;  transform: scaleY(1.1); }
+  }
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity .8s var(--ease), transform .8s var(--ease);
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: .1s; }
+  .reveal-delay-2 { transition-delay: .2s; }
+  .reveal-delay-3 { transition-delay: .3s; }
+  .reveal-delay-4 { transition-delay: .4s; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    nav { padding: 24px 30px; }
+    nav.scrolled { padding: 16px 30px; }
+    .nav-links { display: none; }
+    section { padding: 90px 30px; }
+    #hero { padding: 0 30px; }
+    .about-grid, .results-grid, .contact-grid { grid-template-columns: 1fr; gap: 50px; }
+    .expertise-grid { grid-template-columns: 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .hero-stats { position: static; padding: 40px 0 0; opacity: 1; animation: none; }
+    .hero-number { display: none; }
+    footer { flex-direction: column; gap: 20px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor">
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a class="nav-logo" href="#hero">A. Mercer</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#expertise">Expertise</a></li>
+    <li><a href="#results">Results</a></li>
+    <li><a href="#testimonials">Clients</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a class="nav-cta" href="#contact">Schedule a Call</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-lines"></div>
+  <div class="hero-number">AM</div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-line"></span>
+      <span>Senior Private Banking Advisor</span>
+    </div>
+    <h1 class="hero-name">
+      Alexander<br><em>Mercer</em>
+    </h1>
+    <p class="hero-tagline">Building wealth, trust, and lasting financial legacies.</p>
+    <p class="hero-desc">
+      With over 18 years navigating the intersection of high-net-worth relationships and institutional finance, I deliver bespoke strategies that align ambition with capital — quietly, precisely, and with measurable results.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#contact">Get in Touch</a>
+      <a class="btn-ghost" href="#about">Learn More</a>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div>
+      <span class="hero-stat-num">$2.4B</span>
+      <span class="hero-stat-label">Assets Under Advisory</span>
+    </div>
+    <div>
+      <span class="hero-stat-num">340+</span>
+      <span class="hero-stat-label">Clients Served</span>
+    </div>
+    <div>
+      <span class="hero-stat-num">18+</span>
+      <span class="hero-stat-label">Years of Excellence</span>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Explore</span>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-image-wrap reveal">
+      <div class="about-photo-frame">
+        <div class="about-photo">
+          <span class="about-photo-initials">AM</span>
+          <div class="about-photo-overlay"></div>
+        </div>
+      </div>
+      <div class="about-accent-box"></div>
+      <div class="about-accent-box2"></div>
+    </div>
+
+    <div class="about-text">
+      <div class="section-label reveal">
+        <span class="section-label-line"></span>
+        <span>About</span>
+      </div>
+      <h2 class="section-title reveal">The person<br>behind the <em>numbers</em></h2>
+
+      <div class="gold-divider reveal">
+        <div class="gold-divider-line"></div>
+        <div class="gold-divider-diamond"></div>
+        <div class="gold-divider-line"></div>
+      </div>
+
+      <div class="reveal reveal-delay-1">
+        <p>I began my career at Morgan Stanley's Private Wealth Management division, where I quickly distinguished myself by cultivating relationships with some of New York's most prominent family offices and entrepreneurs. My approach was always relational first, transactional second.</p>
+        <p>Today, as a Senior Advisor, I specialize in structuring complex, multi-generational wealth strategies — from alternative investments and private credit facilities to philanthropic giving vehicles and succession planning.</p>
+        <p>I hold an MBA from Wharton, am a CFA charterholder, and a CERTIFIED FINANCIAL PLANNER™ professional. Beyond the credentials, I bring clarity, candor, and an obsession with client outcomes.</p>
+      </div>
+
+      <div class="about-credentials reveal reveal-delay-2">
+        <span class="credential-tag">CFA Charterholder</span>
+        <span class="credential-tag">CFP® Professional</span>
+        <span class="credential-tag">MBA — Wharton</span>
+        <span class="credential-tag">Series 7 & 66</span>
+        <span class="credential-tag">CIMA®</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERTISE -->
+<section id="expertise">
+  <div class="expertise-header">
+    <div>
+      <div class="section-label reveal">
+        <span class="section-label-line"></span>
+        <span>Services</span>
+      </div>
+      <h2 class="section-title reveal">Core areas of <em>expertise</em></h2>
+    </div>
+    <p class="expertise-intro reveal reveal-delay-1">
+      Every engagement begins with deep listening. Solutions are constructed around your specific situation — never templated.
+    </p>
+  </div>
+
+  <div class="expertise-grid">
+    <div class="expertise-card reveal">
+      <span class="card-number">01</span>
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      <h3 class="card-title">Wealth Structuring & Portfolio Strategy</h3>
+      <p class="card-desc">Holistic portfolio construction across equities, fixed income, alternatives, and real assets — optimized for risk-adjusted return and intergenerational transfer.</p>
+    </div>
+    <div class="expertise-card reveal reveal-delay-1">
+      <span class="card-number">02</span>
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+      </svg>
+      <h3 class="card-title">Corporate & Institutional Banking</h3>
+      <p class="card-desc">Tailored credit facilities, treasury solutions, and capital markets access for mid-market and large corporate clients navigating growth or transition.</p>
+    </div>
+    <div class="expertise-card reveal reveal-delay-2">
+      <span class="card-number">03</span>
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+      </svg>
+      <h3 class="card-title">Retirement & Estate Planning</h3>
+      <p class="card-desc">Forward-looking retirement income strategies, trust structures, and estate plans designed to preserve and transfer wealth with minimal tax burden.</p>
+    </div>
+    <div class="expertise-card reveal reveal-delay-1">
+      <span class="card-number">04</span>
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 3h18v4H3z"/><path d="M3 10h18v4H3z"/><path d="M3 17h18v4H3z"/>
+      </svg>
+      <h3 class="card-title">Alternative Investments</h3>
+      <p class="card-desc">Access to institutional-quality private equity, hedge funds, real estate partnerships, and structured products unavailable through retail channels.</p>
+    </div>
+    <div class="expertise-card reveal reveal-delay-2">
+      <span class="card-number">05</span>
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <h3 class="card-title">Family Office Advisory</h3>
+      <p class="card-desc">Comprehensive governance, reporting, and investment oversight for ultra-high-net-worth families seeking institutional-grade management and coordination.</p>
+    </div>
+    <div class="expertise-card reveal reveal-delay-3">
+      <span class="card-number">06</span>
+      <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      <h3 class="card-title">Business Owner Solutions</h3>
+      <p class="card-desc">From liquidity events and M&A advisory to employee benefit plan design and buy-sell agreement funding — strategies built for the entrepreneur.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results">
+  <div class="results-bg-text">RESULTS</div>
+  <div class="results-grid">
+    <div class="metrics-stack reveal">
+      <div class="metric-row">
+        <span class="metric-value">$2.4B</span>
+        <div class="metric-info">
+          <div class="metric-label">Total Assets Under Advisory</div>
+          <div class="metric-sub">Across all client relationships</div>
+        </div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-value">97%</span>
+        <div class="metric-info">
+          <div class="metric-label">Client Retention Rate</div>
+          <div class="metric-sub">Averaged over the past decade</div>
+        </div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-value">340+</span>
+        <div class="metric-info">
+          <div class="metric-label">Active Client Relationships</div>
+          <div class="metric-sub">HNW individuals, families & corporates</div>
+        </div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-value">4.2×</span>
+        <div class="metric-info">
+          <div class="metric-label">Average AUM Growth</div>
+          <div class="metric-sub">Per client over a 10-year horizon</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-text reveal reveal-delay-2">
+      <div class="section-label">
+        <span class="section-label-line"></span>
+        <span>Track Record</span>
+      </div>
+      <h2 class="section-title">Results that<br>speak <em>clearly</em></h2>
+      <p>In private banking, outcomes are the only currency that matters. Over 18 years, I have consistently delivered above-benchmark returns while maintaining the discretion and personalised attention that high-net-worth clients demand.</p>
+      <p>My competitive edge lies not just in market access or product knowledge, but in understanding the human dimensions of wealth — family dynamics, risk tolerance, life goals, and legacy intentions.</p>
+
+      <div class="results-quote">
+        <p>"Alexander doesn't just manage money — he manages relationships. He saw our family's full picture and built a strategy that has outlasted three market corrections."</p>
+        <cite>— Principal, Whitmore Family Office, NYC</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-label reveal">
+    <span class="section-label-line"></span>
+    <span>Client Voices</span>
+  </div>
+  <h2 class="section-title reveal">What clients <em>say</em></h2>
+
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"From our first meeting, Alexander understood that we weren't just looking for returns — we were building a legacy. His guidance through our liquidity event was invaluable."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">RH</div>
+        <div>
+          <div class="author-name">Robert Harrington</div>
+          <div class="author-title">Founder, Harrington Logistics Group</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"Working with Alexander feels less like working with a banker and more like having a trusted partner at the table. He's proactive, transparent, and always thinking three steps ahead."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">SL</div>
+        <div>
+          <div class="author-name">Sarah Lin</div>
+          <div class="author-title">CFO, Veridian Capital Partners</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"After the sale of our company, we needed someone who could handle complexity with care. Alexander did exactly that — coordinating estate attorneys, tax advisors, and investment teams seamlessly."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">MP</div>
+        <div>
+          <div class="author-name">Marcus & Patricia Webb</div>
+          <div class="author-title">Private Clients, 14 years</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label reveal">
+    <span class="section-label-line"></span>
+    <span>Contact</span>
+  </div>
+  <h2 class="section-title reveal">Let's start a <em>conversation</em></h2>
+
+  <div class="contact-grid">
+    <div class="contact-info reveal">
+      <p>I typically work with individuals, families, and businesses with investable assets of $5M or more. If you're looking for a trusted advisor to help you think clearly about your financial future, I'd welcome a confidential conversation.</p>
+
+      <div class="contact-items">
+        <div class="contact-item">
+          <div class="contact-item-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.06 6.06l.94-.94a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div>
+            <div class="contact-item-label">Phone</div>
+            <div class="contact-item-value">+1 (212) 555-0182</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <div class="contact-item-label">Email</div>
+            <div class="contact-item-value">a.mercer@privatewealth.com</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <div class="contact-item-label">Office</div>
+            <div class="contact-item-value">399 Park Avenue, 12th Floor, New York, NY 10022</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form class="contact-form reveal reveal-delay-1" onsubmit="handleSubmit(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input class="form-input" type="text" placeholder="John" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input class="form-input" type="text" placeholder="Smith" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" placeholder="john@example.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nature of Inquiry</label>
+        <select class="form-select form-input">
+          <option value="" disabled selected>Select a topic</option>
+          <option>Wealth Management</option>
+          <option>Corporate Banking</option>
+          <option>Estate & Retirement Planning</option>
+          <option>Alternative Investments</option>
+          <option>Family Office Services</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" placeholder="Tell me about your current situation and what you're hoping to achieve…"></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Send Message →</button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">Alexander Mercer</span>
+  <span class="footer-copy">© 2026 · All rights reserved · Investment advisory services provided under applicable regulations</span>
+  <div class="footer-social">
+    <a class="social-link" href="#" title="LinkedIn">in</a>
+    <a class="social-link" href="#" title="Twitter">𝕏</a>
+    <a class="social-link" href="#" title="Email">✉</a>
+  </div>
+</footer>
+
+<script>
+  // Cursor
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+    rx += (mx - rx) * .12; ry += (my - ry) * .12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+
+  // Navbar scroll
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => io.observe(el));
+
+  // Counter animation
+  function animateCounter(el, target, suffix='') {
+    let start = 0, duration = 1800;
+    const step = timestamp => {
+      if (!start) start = timestamp;
+      const progress = Math.min((timestamp - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = (Number.isInteger(target) ? Math.floor(eased * target) : (eased * target).toFixed(1)) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // Form submit
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.submit-btn');
+    btn.textContent = 'Message Sent ✓';
+    btn.style.background = 'var(--gold)';
+    btn.style.color = 'var(--navy)';
+    btn.disabled = true;
+  }
+</script>
+</body>
+</html>
